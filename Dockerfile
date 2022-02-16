@@ -2,40 +2,40 @@
 FROM alpine:3.15.0 as release-downloader
 
 # The koel version to download
-ARG KOEL_VERSION_REF=v5.1.13
+ARG KOEL_VERSION_REF=v5.1.13-karvel
 
 # Install curl to download the release tar.gz
 RUN apk add --no-cache curl
 
 # Download the koel release matching the version and remove anything not necessary for production
-RUN curl -L https://github.com/koel/koel/releases/download/${KOEL_VERSION_REF}/koel-${KOEL_VERSION_REF}.tar.gz | tar -xz -C /tmp \
+RUN curl -L https://github.com/yoeran/koel/releases/download/${KOEL_VERSION_REF}/koel-${KOEL_VERSION_REF}.tar.gz | tar -xz -C /tmp \
   && cd /tmp/koel/ \
   && rm -rf .editorconfig \
-    .eslintignore \
-    .eslintrc \
-    .git \
-    .gitattributes \
-    .github \
-    .gitignore \
-    .gitmodules \
-    .gitpod.dockerfile \
-    .gitpod.yml \
-    composer.lock \
-    cypress \
-    cypress.json \
-    nginx.conf.example \
-    package.json \
-    phpstan.neon.dist \
-    phpunit.xml.dist \
-    resources/artifacts/ \
-    resources/assets/ \
-    ruleset.xml \
-    scripts/ \
-    tag.sh \
-    tests \
-    webpack.config.js \
-    webpack.mix.js \
-    yarn.lock
+  .eslintignore \
+  .eslintrc \
+  .git \
+  .gitattributes \
+  .github \
+  .gitignore \
+  .gitmodules \
+  .gitpod.dockerfile \
+  .gitpod.yml \
+  composer.lock \
+  cypress \
+  cypress.json \
+  nginx.conf.example \
+  package.json \
+  phpstan.neon.dist \
+  phpunit.xml.dist \
+  resources/artifacts/ \
+  resources/assets/ \
+  ruleset.xml \
+  scripts/ \
+  tag.sh \
+  tests \
+  webpack.config.js \
+  webpack.mix.js \
+  yarn.lock
 
 # The runtime image.
 FROM php:7.4.27-apache-buster
@@ -43,26 +43,26 @@ FROM php:7.4.27-apache-buster
 # Install koel runtime dependencies.
 RUN apt-get update \
   && apt-get install --yes --no-install-recommends \
-    libapache2-mod-xsendfile \
-    libzip-dev \
-    zip \
-    ffmpeg \
-    locales \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libpq-dev \
+  libapache2-mod-xsendfile \
+  libzip-dev \
+  zip \
+  ffmpeg \
+  locales \
+  libpng-dev \
+  libjpeg62-turbo-dev \
+  libpq-dev \
   && docker-php-ext-configure gd --with-jpeg \
   # https://laravel.com/docs/8.x/deployment#server-requirements
   # ctype, fileinfo, json, mbstring, openssl, tokenizer and xml are already activated in the base image
   && docker-php-ext-install \
-    bcmath \
-    exif \
-    gd \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pgsql \
-    zip \
+  bcmath \
+  exif \
+  gd \
+  pdo \
+  pdo_mysql \
+  pdo_pgsql \
+  pgsql \
+  zip \
   && apt-get clean \
   # Create the music volume so it has the correct permissions
   && mkdir /music \
@@ -95,11 +95,11 @@ COPY --from=release-downloader --chown=www-data:www-data /tmp/koel /var/www/html
 VOLUME ["/music", "/var/www/html/storage/search-indexes"]
 
 ENV FFMPEG_PATH=/usr/bin/ffmpeg \
-    MEDIA_PATH=/music \
-    STREAMING_METHOD=x-sendfile \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en \
-    LC_ALL=en_US.UTF-8
+  MEDIA_PATH=/music \
+  STREAMING_METHOD=x-sendfile \
+  LANG=en_US.UTF-8 \
+  LANGUAGE=en_US:en \
+  LC_ALL=en_US.UTF-8
 
 # Setup bootstrap script.
 COPY koel-entrypoint /usr/local/bin/
